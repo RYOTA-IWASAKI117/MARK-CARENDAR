@@ -67,12 +67,13 @@ background:#666;
 <script>
 
 let selectedDays = []
+let calendar
 
 document.addEventListener('DOMContentLoaded', function() {
 
 let calendarEl = document.getElementById('calendar')
 
-let calendar = new FullCalendar.Calendar(calendarEl, {
+calendar = new FullCalendar.Calendar(calendarEl, {
 
 initialView: 'dayGridMonth',
 
@@ -80,15 +81,21 @@ dateClick: function(info) {
 
 let date = info.dateStr
 
+// すでにマークがある場合 → 消す
 if(selectedDays.includes(date)){
 
-selectedDays = selectedDays.filter(d=>d!==date)
+selectedDays = selectedDays.filter(d => d !== date)
 
-calendar.getEvents().forEach(event=>{
-if(event.startStr===date) event.remove()
+calendar.getEvents().forEach(event => {
+if(event.startStr === date){
+event.remove()
+}
 })
 
-}else{
+}
+
+// マークがない場合 → 付ける
+else{
 
 selectedDays.push(date)
 
@@ -125,6 +132,5 @@ link.click()
 }
 
 </script>
-
 </body>
 </html>

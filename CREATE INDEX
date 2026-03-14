@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MARK CALENDAR</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+
+body{
+background:#121212;
+color:white;
+font-family:sans-serif;
+text-align:center;
+margin:0;
+}
+
+h1{
+margin-top:30px;
+letter-spacing:3px;
+}
+
+#calendar{
+max-width:900px;
+margin:40px auto;
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+}
+
+button{
+
+background:#444;
+color:white;
+border:none;
+padding:12px 20px;
+font-size:16px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:40px;
+
+}
+
+button:hover{
+background:#666;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>MARK CALENDAR</h1>
+
+<div id="capture">
+
+<div id="calendar"></div>
+
+</div>
+
+<button onclick="saveImage()">保存して共有</button>
+
+<script>
+
+let selectedDays = []
+
+document.addEventListener('DOMContentLoaded', function() {
+
+let calendarEl = document.getElementById('calendar')
+
+let calendar = new FullCalendar.Calendar(calendarEl, {
+
+initialView: 'dayGridMonth',
+
+dateClick: function(info) {
+
+let date = info.dateStr
+
+if(selectedDays.includes(date)){
+
+selectedDays = selectedDays.filter(d=>d!==date)
+
+calendar.getEvents().forEach(event=>{
+if(event.startStr===date) event.remove()
+})
+
+}else{
+
+selectedDays.push(date)
+
+calendar.addEvent({
+title:"●",
+start:date,
+allDay:true
+})
+
+}
+
+}
+
+})
+
+calendar.render()
+
+})
+
+function saveImage(){
+
+html2canvas(document.querySelector("#capture")).then(canvas=>{
+
+let link=document.createElement("a")
+
+link.download="mark-calendar.png"
+
+link.href=canvas.toDataURL()
+
+link.click()
+
+})
+
+}
+
+</script>
+
+</body>
+</html>

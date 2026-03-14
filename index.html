@@ -20,15 +20,20 @@ margin:0;
 
 h1{
 margin-top:30px;
-letter-spacing:3px;
+letter-spacing:4px;
+}
+
+#capture{
+background:#1e1e1e;
+padding:20px;
+border-radius:12px;
+max-width:900px;
+margin:auto;
 }
 
 #calendar{
 max-width:900px;
-margin:40px auto;
-background:#1e1e1e;
-padding:20px;
-border-radius:10px;
+margin:auto;
 }
 
 button{
@@ -36,12 +41,11 @@ button{
 background:#444;
 color:white;
 border:none;
-padding:12px 20px;
+padding:14px 22px;
 font-size:16px;
-border-radius:6px;
+border-radius:8px;
 cursor:pointer;
-margin-bottom:40px;
-
+margin:30px;
 }
 
 button:hover{
@@ -58,6 +62,8 @@ background:#666;
 
 <div id="capture">
 
+<h2>MARK CALENDAR</h2>
+
 <div id="calendar"></div>
 
 </div>
@@ -66,35 +72,35 @@ background:#666;
 
 <script>
 
-let selectedDays = []
+let selectedDays=[]
 let calendar
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded',function(){
 
-let calendarEl = document.getElementById('calendar')
+let calendarEl=document.getElementById('calendar')
 
-calendar = new FullCalendar.Calendar(calendarEl, {
+calendar=new FullCalendar.Calendar(calendarEl,{
 
-initialView: 'dayGridMonth',
+initialView:'dayGridMonth',
 
-dateClick: function(info) {
+dateClick:function(info){
 
-let date = info.dateStr
+let date=info.dateStr
 
-// すでにマークがある場合 → 消す
+// 既に選択されてる場合
 if(selectedDays.includes(date)){
 
-selectedDays = selectedDays.filter(d => d !== date)
+selectedDays=selectedDays.filter(d=>d!==date)
 
-calendar.getEvents().forEach(event => {
-if(event.startStr === date){
+calendar.getEvents().forEach(event=>{
+if(event.startStr===date){
 event.remove()
 }
 })
 
 }
 
-// マークがない場合 → 付ける
+// まだ選択されてない場合
 else{
 
 selectedDays.push(date)
@@ -115,22 +121,42 @@ calendar.render()
 
 })
 
+
 function saveImage(){
 
 html2canvas(document.querySelector("#capture")).then(canvas=>{
 
+canvas.toBlob(function(blob){
+
+const file=new File([blob],"mark-calendar.png",{type:"image/png"})
+
+// iPhone共有
+if(navigator.share){
+
+navigator.share({
+files:[file],
+title:"MARK CALENDAR"
+})
+
+}
+
+// 非対応ブラウザ
+else{
+
 let link=document.createElement("a")
-
 link.download="mark-calendar.png"
-
 link.href=canvas.toDataURL()
-
 link.click()
+
+}
+
+})
 
 })
 
 }
 
 </script>
+
 </body>
 </html>

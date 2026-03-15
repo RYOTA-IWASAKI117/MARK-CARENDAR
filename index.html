@@ -37,7 +37,6 @@ margin:auto;
 }
 
 button{
-
 background:#444;
 color:white;
 border:none;
@@ -72,7 +71,6 @@ background:#666;
 
 <script>
 
-let selectedDays=[]
 let calendar
 
 document.addEventListener('DOMContentLoaded',function(){
@@ -87,28 +85,34 @@ dateClick:function(info){
 
 let date=info.dateStr
 
-// 既に選択されてる場合
-if(selectedDays.includes(date)){
+let existingEvent=calendar.getEvents().find(e=>e.startStr===date)
 
-selectedDays=selectedDays.filter(d=>d!==date)
 
-calendar.getEvents().forEach(event=>{
-if(event.startStr===date){
-event.remove()
-}
-})
+// 既にある場合 → 削除
+if(existingEvent){
+
+existingEvent.remove()
 
 }
 
-// まだ選択されてない場合
+
+// 無い場合 → 時間入力
 else{
 
-selectedDays.push(date)
+let start=prompt("開始時間 (例 18:00)")
+if(!start) return
+
+let end=prompt("終了時間 (例 21:00)")
+if(!end) return
 
 calendar.addEvent({
-title:"●",
+
+title:`${start}-${end}`,
+
 start:date,
+
 allDay:true
+
 })
 
 }
@@ -122,6 +126,7 @@ calendar.render()
 })
 
 
+
 function saveImage(){
 
 html2canvas(document.querySelector("#capture")).then(canvas=>{
@@ -130,7 +135,6 @@ canvas.toBlob(function(blob){
 
 const file=new File([blob],"mark-calendar.png",{type:"image/png"})
 
-// iPhone共有
 if(navigator.share){
 
 navigator.share({
@@ -138,10 +142,7 @@ files:[file],
 title:"MARK CALENDAR"
 })
 
-}
-
-// 非対応ブラウザ
-else{
+}else{
 
 let link=document.createElement("a")
 link.download="mark-calendar.png"

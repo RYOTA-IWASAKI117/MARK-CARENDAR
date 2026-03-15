@@ -51,6 +51,23 @@ button:hover{
 background:#666;
 }
 
+#timeModal{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+input{
+padding:8px;
+margin:10px;
+}
+
 </style>
 
 </head>
@@ -69,9 +86,28 @@ background:#666;
 
 <button onclick="saveImage()">保存して共有</button>
 
+
+<div id="timeModal">
+
+<p>時間を選択</p>
+
+開始  
+<input type="time" id="startTime">
+
+終了  
+<input type="time" id="endTime">
+
+<br>
+
+<button onclick="addTime()">OK</button>
+
+</div>
+
+
 <script>
 
 let calendar
+let selectedDate=null
 
 document.addEventListener('DOMContentLoaded',function(){
 
@@ -87,33 +123,17 @@ let date=info.dateStr
 
 let existingEvent=calendar.getEvents().find(e=>e.startStr===date)
 
-
-// 既にある場合 → 削除
 if(existingEvent){
 
 existingEvent.remove()
 
 }
 
-
-// 無い場合 → 時間入力
 else{
 
-let start=prompt("開始時間 (例 18:00)")
-if(!start) return
+selectedDate=date
 
-let end=prompt("終了時間 (例 21:00)")
-if(!end) return
-
-calendar.addEvent({
-
-title:`${start}-${end}`,
-
-start:date,
-
-allDay:true
-
-})
+document.getElementById("timeModal").style.display="block"
 
 }
 
@@ -125,6 +145,27 @@ calendar.render()
 
 })
 
+
+function addTime(){
+
+let start=document.getElementById("startTime").value
+let end=document.getElementById("endTime").value
+
+if(!start||!end)return
+
+calendar.addEvent({
+
+title:`${start}-${end}`,
+
+start:selectedDate,
+
+allDay:true
+
+})
+
+document.getElementById("timeModal").style.display="none"
+
+}
 
 
 function saveImage(){

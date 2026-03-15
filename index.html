@@ -31,7 +31,7 @@ max-width:900px;
 margin:auto;
 }
 
-#calendar{
+#calendarMark,#calendarTime{
 max-width:900px;
 margin:auto;
 }
@@ -44,11 +44,15 @@ padding:14px 22px;
 font-size:16px;
 border-radius:8px;
 cursor:pointer;
-margin:30px;
+margin:10px;
 }
 
 button:hover{
 background:#666;
+}
+
+#calendarTime{
+display:none;
 }
 
 #timeModal{
@@ -80,21 +84,25 @@ margin:10px;
 
 <h2>MARK CALENDAR</h2>
 
-<div id="calendar"></div>
+<div id="calendarMark"></div>
+<div id="calendarTime"></div>
 
 </div>
 
 <button onclick="saveImage()">保存して共有</button>
 
+<br>
+
+<button id="toggleBtn" onclick="switchCalendar()">時間まで設定</button>
 
 <div id="timeModal">
 
 <p>時間を選択</p>
 
-開始  
+開始
 <input type="time" id="startTime">
 
-終了  
+終了
 <input type="time" id="endTime">
 
 <br>
@@ -103,17 +111,20 @@ margin:10px;
 
 </div>
 
-
 <script>
 
-let calendar
+let markCalendar
+let timeCalendar
 let selectedDate=null
+let timeMode=false
 
 document.addEventListener('DOMContentLoaded',function(){
 
-let calendarEl=document.getElementById('calendar')
+let markEl=document.getElementById('calendarMark')
+let timeEl=document.getElementById('calendarTime')
 
-calendar=new FullCalendar.Calendar(calendarEl,{
+
+markCalendar=new FullCalendar.Calendar(markEl,{
 
 initialView:'dayGridMonth',
 
@@ -121,18 +132,44 @@ dateClick:function(info){
 
 let date=info.dateStr
 
-let existingEvent=calendar.getEvents().find(e=>e.startStr===date)
+let existingEvent=markCalendar.getEvents().find(e=>e.startStr===date)
 
 if(existingEvent){
 
 existingEvent.remove()
 
+}else{
+
+markCalendar.addEvent({
+title:"●",
+start:date,
+allDay:true
+})
+
 }
 
-else{
+}
+
+})
+
+
+timeCalendar=new FullCalendar.Calendar(timeEl,{
+
+initialView:'dayGridMonth',
+
+dateClick:function(info){
+
+let date=info.dateStr
+
+let existingEvent=timeCalendar.getEvents().find(e=>e.startStr===date)
+
+if(existingEvent){
+
+existingEvent.remove()
+
+}else{
 
 selectedDate=date
-
 document.getElementById("timeModal").style.display="block"
 
 }
@@ -141,9 +178,37 @@ document.getElementById("timeModal").style.display="block"
 
 })
 
-calendar.render()
+markCalendar.render()
+timeCalendar.render()
 
 })
+
+
+function switchCalendar(){
+
+timeMode=!timeMode
+
+if(timeMode){
+
+document.getElementById("calendarMark").style.display="none"
+document.getElementById("calendarTime").style.display="block"
+
+document.getElementById("toggleBtn").innerText="日程のみ設定"
+
+timeCalendar.updateSize()
+
+}else{
+
+document.getElementById("calendarMark").style.display="block"
+document.getElementById("calendarTime").style.display="none"
+
+document.getElementById("toggleBtn").innerText="時間まで設定"
+
+markCalendar.updateSize()
+
+}
+
+}
 
 
 function addTime(){
@@ -153,12 +218,10 @@ let end=document.getElementById("endTime").value
 
 if(!start||!end)return
 
-calendar.addEvent({
+timeCalendar.addEvent({
 
 title:`${start}-${end}`,
-
 start:selectedDate,
-
 allDay:true
 
 })
